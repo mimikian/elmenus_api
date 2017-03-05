@@ -76,6 +76,9 @@ function initMapping() {
   });
 }
 
+/**
+* add a restaurant row to restaurants index
+*/
 function addDocument(document) {  
   return elasticClient.index({
     index: indexName,
@@ -91,6 +94,29 @@ function addDocument(document) {
   });
 }
 
+/**
+* add a restaurant row to restaurants index
+*/
+
+function getAllRestaurants(input) { 
+  var page = input.page
+  if(input.page === undefined)
+    page = 1;
+  var size = PAGE_SIZE;
+  return elasticClient.search({
+    index: indexName,
+    type: "restaurant",
+    body: {
+      from: page*size,
+      size: size,
+      query : {
+        match_all: {}
+      }
+    }
+  })
+}
+
+exports.getAllRestaurants = getAllRestaurants;
 exports.addDocument = addDocument;
 exports.indexExists = indexExists; 
 exports.initMapping = initMapping;

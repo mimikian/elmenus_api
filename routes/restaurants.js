@@ -1,9 +1,10 @@
-var express = require('express');
+var express = require('express');  
 var router = express.Router();
+var elastic = require('../elasticsearch');
 
-/* GET restaurant listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+/* GET all restaurants */
+router.get('/', function (req, res, next) {  
+  elastic.getAllRestaurants(req.query).then(function (result) { res.json(result) });
 });
 
 module.exports = router;

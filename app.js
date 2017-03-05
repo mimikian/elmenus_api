@@ -4,10 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var index = require('./routes/index');
 var restaurants = require('./routes/restaurants');
-
 var app = express();
 
 // view engine setup
@@ -22,8 +20,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// routes
 app.use('/', index);
-app.use('/restaurants', restaurants);
+app.use('/api/restaurants', restaurants);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -43,12 +42,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-
 var elastic = require('./elasticsearch');  
 const csvFilePath='data/restaurants.csv'
 const csv=require('csvtojson')
 
-
+// importing data from csv to the index if the index is not created
 elastic.indexExists().then(function (exists) {  
   if (!exists) {
     return elastic.initIndex().then(elastic.initMapping).then(function () {    
