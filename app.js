@@ -43,4 +43,22 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
+var elastic = require('./elasticsearch');  
+const csvFilePath='data/restaurants.csv'
+const csv=require('csvtojson')
+
+
+elastic.indexExists().then(function (exists) {  
+  if (!exists) {
+    return elastic.initIndex().then(elastic.initMapping).then(function () {    
+      csv()
+      .fromFile(csvFilePath)
+      .on('json',(restaurant)=>{
+        elastic.addDocument(restaurant);
+      })
+    });
+  }
+});
+
 module.exports = app;
