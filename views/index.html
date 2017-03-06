@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html ng-app="elmenusRestaurants">
+  <head>
+    <title>elmenus API</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+    <script src="javascripts/app.js" type="text/javascript"></script>
+  </head>
+  <body >
+    <div class="well container" ng-controller="elmenusRestaurantsCtrl">
+      <div class="well container-fluid">
+        <button class="btn btn-primary" ng-click="allRestaurantsCtrl()">
+        All Restaurants
+        </button>
+        <button class="btn btn-success" ng-click="getOpenedRestaurants()">
+        Opened Restaurants
+        </button>
+      </div>
+      <div class="container-fluid">
+        <td colspan="3">
+          <div class="pagination">
+            <p>
+              <a href ng-click="prevPage()">« Prev</a> | <a href ng-click="nextPage()">Next »</a>
+            </p>
+          </div>
+        </td>
+        <div class="list-group" ng-repeat="item in data">
+          <ul>
+            <li class="list-group-item">Name: {{item._source.name_en}}</li>
+            <li class="list-group-item">Opening hour: {{item._source.opening_hr | date }}</li>
+            <li class="list-group-item">Closing hour: {{item._source.closing_hr | date }}</li>
+          </ul>   
+        </div>
+        <td colspan="3">
+          <div class="pagination">
+            <p>
+              <a href ng-click="prevPage()">« Prev</a> | <a href ng-click="nextPage()">Next »</a>
+            </p>
+          </div>
+        </td>
+      </div>
+    </div>
+  </body>
+</html>
