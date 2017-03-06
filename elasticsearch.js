@@ -92,7 +92,15 @@ function addDocument(document) {
       closing_hr: utils.convertTo24Hour(document.closing_hr),
       opening_hr_in_seconds: utils.timeToSeconds(utils.convertTo24Hour(document.opening_hr)),
       closing_hr_in_seconds: utils.timeToSeconds(utils.returnEndTimeAfterStartingTime(document.opening_hr, document.closing_hr)),
-      created_at: document.created_at
+      created_at: document.created_at,
+      updated_at: document.updated_at,
+      city_id: document.city_id,
+      delivery_charge: document.delivery_charge,
+      description_ar: document.description_ar,
+      menus_count: document.menus_count,
+      reviews_count: document.reviews_count,
+      branches_count: document.branches_count,
+      photos_count: document.photos_count
     }
   });
 }
