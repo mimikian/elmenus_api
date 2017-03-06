@@ -111,7 +111,7 @@ function addDocument(document) {
 function getAllRestaurants(input) { 
   var page = input.page
   if(input.page === undefined)
-    page = 1;
+    page = 0;
   var size = PAGE_SIZE;
   return elasticClient.search({
     index: indexName,
@@ -134,7 +134,7 @@ function getOpenedRestaurants(input) {
   var currentTimeInSeconds = utils.timeToSeconds(currentTime);
   var page = input.page
   if(input.page === undefined)
-    page = 1;
+    page = 0;
   var size = PAGE_SIZE;
   return elasticClient.search({
     index: indexName,
