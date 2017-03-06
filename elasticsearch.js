@@ -1,6 +1,5 @@
 var elasticsearch = require('elasticsearch');
 var utils = require("./lib/utils.js");
-
 var elasticClient = new elasticsearch.Client({  
   host: 'localhost:9200',
   log: 'info'
@@ -61,6 +60,8 @@ function initMapping() {
           type:   "date",
           format: "hour_minute_second"
         },
+        opening_hr_in_seconds: { type: "long" },
+        closing_hr_in_seconds: { type: "long" },
         photos_count: { type: "long" },
         branches_count: { type: "long" },
         reviews_count: { type: "long" },
@@ -79,7 +80,7 @@ function initMapping() {
 /**
 * add a restaurant row to restaurants index
 */
-function addDocument(document) {  
+function addDocument(document) { 
   return elasticClient.index({
     index: indexName,
     type: "restaurant",
@@ -89,15 +90,16 @@ function addDocument(document) {
       name_ar: document.name_ar,
       opening_hr: utils.convertTo24Hour(document.opening_hr),
       closing_hr: utils.convertTo24Hour(document.closing_hr),
+      opening_hr_in_seconds: utils.timeToSeconds(utils.convertTo24Hour(document.opening_hr)),
+      closing_hr_in_seconds: utils.timeToSeconds(utils.returnEndTimeAfterStartingTime(document.opening_hr, document.closing_hr)),
       created_at: document.created_at
     }
   });
 }
 
 /**
-* add a restaurant row to restaurants index
+* returns the restaurants with specific page if passed
 */
-
 function getAllRestaurants(input) { 
   var page = input.page
   if(input.page === undefined)
@@ -116,7 +118,79 @@ function getAllRestaurants(input) {
   })
 }
 
+/**
+* returns currently opened restaurants  with specific page if passed
+*/
+function getOpenedRestaurants(input) { 
+  var currentTime = utils.getDateTime();
+  var currentTimeInSeconds = utils.timeToSeconds(currentTime);
+  var page = input.page
+  if(input.page === undefined)
+    page = 1;
+  var size = PAGE_SIZE;
+  return elasticClient.search({
+    index: indexName,
+    type: "restaurant",
+    body: {
+      from: page*size,
+      size: size,
+      filter: {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      range: {
+                        opening_hr: {
+                          lte: currentTime
+                        }
+                      }
+                    },
+                    {
+                      range: {
+                        closing_hr: {
+                          gt: currentTime
+                        }
+                      }
+                    }
+                  ],
+                  minimum_number_should_match: 2
+                }
+             },
+             {
+              bool:{
+                must: [
+                  {
+                    range: {
+                      opening_hr_in_seconds: {
+                        lte: currentTimeInSeconds
+                      }
+                    }
+                  },
+                  {
+                    range: {
+                      closing_hr_in_seconds: {
+                        gt: currentTimeInSeconds
+                      }
+                    }
+                  }
+                ],
+                minimum_number_should_match: 2
+              }
+              }
+             ],
+             minimum_number_should_match: 1
+          }
+        }
+      }
+    }
+  })
+}
+
 exports.getAllRestaurants = getAllRestaurants;
+exports.getOpenedRestaurants = getOpenedRestaurants;
 exports.addDocument = addDocument;
 exports.indexExists = indexExists; 
 exports.initMapping = initMapping;
